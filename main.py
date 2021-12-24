@@ -10,7 +10,21 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = True 
-    rating: Optional[int] = None 
+    rating: Optional[int] = None # for integers
+
+my_posts = [
+         {
+            "title": "title of post 1",
+            "content": "content of post 1", 
+            "id": 1,
+
+        }, 
+        {
+            "title": "favorite foods", 
+            "content": "I like pizza",
+            "id": 2, 
+        },
+]
 
 @app.get("/")
 async def root():
@@ -18,13 +32,13 @@ async def root():
 
 @app.get("/posts")
 def get_posts():
-    return{'data': "This is your posts"}
+    return{'data': my_posts}
 
 
-@app.post('/create_post')
-def create_post(new_post: Post): 
+@app.post('/posts')
+def create_posts(post: Post): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
-    print(new_post.title)
-    return{"data": "new post"} #to retreive the raw posts
+    my_posts.append(post.dict())
+    return{"data": post} #to retreive the raw posts
 
 # title str, content str
