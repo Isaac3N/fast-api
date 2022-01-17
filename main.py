@@ -15,6 +15,7 @@ class Post(BaseModel): #this is an extended base model using pydantic
     rating: Optional[int] = None # for integers
     id: Optional[int]=None
 
+
 my_posts = [
          {
             "title": "title of post 1",
@@ -38,7 +39,7 @@ def find_posts(id):
 def find_index_post(id):
     for i, p in enumerate(my_posts):
         if p['id'] == id:
-            return p
+            return i
 
 
 @app.get("/")
@@ -76,5 +77,21 @@ def delete_post(id:int):
     #deleting a post
     #find the index in the array that has required id 
     index = find_index_post(id)
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+            detail= f"post with id: {id} does not exist" )
+
     my_posts.pop(index)
-    return{"message": "The post was sucessfully deleted"}
+    return Response(status_code= status.HTTP_204_NO_CONTENT)
+
+@app.put("/posts/{id}")
+def update_post(id: int, post:Post):
+    index = find_index_post(id)
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+            detail= f"post with id: {id} does not exist" )
+    post_dict = post.dict()
+    post_dict['id']= id
+    my_posts[index] = post_dict
+    return {"data": post_dict}
+ 
