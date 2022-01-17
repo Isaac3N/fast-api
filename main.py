@@ -1,5 +1,6 @@
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
+from fastapi.exceptions import HTTPException 
 from fastapi.param_functions import Body
 from pydantic import BaseModel
 from random import  randrange
@@ -34,6 +35,12 @@ def find_posts(id):
             return p
 #logic to find the id 
 
+def find_index_post(id):
+    for i, p in enumerate(my_posts):
+        if p['id'] == id:
+            return p
+
+
 @app.get("/")
 async def root():
     return {"message" : "Hello world"}
@@ -55,6 +62,19 @@ def create_posts(post: Post):
 # title str, content str
 
 @app.get("/posts/{id}") #to retrieve the information from the path
-def get_post(id:int): #to convert the id into an integer
+def get_post(id:int, response: Response): #to convert the id into an integer
     post = find_posts(id)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                                detail=f"post with the id {id} not found.")
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"message": f"post with the id {id} not found."}
     return(post)
+
+@app.delete("/posts/{id}")
+def delete_post(id:int):
+    #deleting a post
+    #find the index in the array that has required id 
+    index = find_index_post(id)
+    my_posts.pop(index)
+    return{"message": "The post was sucessfully deleted"}
