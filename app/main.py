@@ -74,18 +74,21 @@ def get_posts():
 def create_posts(post: Post): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
     # %s is a way of passing parameters to a SQL statement, and passing a sequence of values as the second argument of the function
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING """, 
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING *""", 
         (post.title, post.content, post.published)) # order those matter 
     # post_dict=  post.dict()#convert the Post class to a dixtionary 
     # post_dict['id'] = randrange(0, 100000000) #creates a random integer of
     # my_posts.append(post_dict)
     new_post = cursor.fetchone()  
+    conn.commit()
     return{"data": new_post} #to retreive the raw posts
 
 # title str, content str
 
 @app.get("/posts/{id}") #to retrieve the information from the path
-def get_post(id:int, response: Response): #to convert the id into an integer
+def get_post(id:int): #to convert the id into an integer
+    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id)))
+    post=cursor.fetchone()
     post = find_posts(id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
