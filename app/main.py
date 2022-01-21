@@ -73,11 +73,14 @@ def get_posts():
 @app.post('/posts')
 def create_posts(post: Post): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
-
-    post_dict=  post.dict()#convert the Post class to a dixtionary 
-    post_dict['id'] = randrange(0, 100000000) #creates a random integer of
-    my_posts.append(post_dict)
-    return{"data": post_dict} #to retreive the raw posts
+    # %s is a way of passing parameters to a SQL statement, and passing a sequence of values as the second argument of the function
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING """, 
+        (post.title, post.content, post.published)) # order those matter 
+    # post_dict=  post.dict()#convert the Post class to a dixtionary 
+    # post_dict['id'] = randrange(0, 100000000) #creates a random integer of
+    # my_posts.append(post_dict)
+    new_post = cursor.fetchone()  
+    return{"data": new_post} #to retreive the raw posts
 
 # title str, content str
 
