@@ -87,9 +87,8 @@ def create_posts(post: Post):
 
 @app.get("/posts/{id}") #to retrieve the information from the path
 def get_post(id:int): #to convert the id into an integer
-    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id)))
+    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
     post=cursor.fetchone()
-    post = find_posts(id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                                 detail=f"post with the id {id} not found.")
@@ -101,12 +100,16 @@ def get_post(id:int): #to convert the id into an integer
 def delete_post(id:int):
     #deleting a post
     #find the index in the array that has required id 
-    index = find_index_post(id)
-    if index == None:
+    cursor.execute("""DELETE FROM posts WHERE id= %s RETURNING *""", (str(id),))
+    deleted_post=cursor.fetchone()
+    conn.commit()
+
+    if deleted_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
             detail= f"post with id: {id} does not exist" )
 
-    my_posts.pop(index)
+    my_posts.pop(deleted_post)
+  
     return Response(status_code= status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
