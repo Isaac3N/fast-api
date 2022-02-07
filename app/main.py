@@ -27,7 +27,7 @@ class Post(BaseModel): #this is an extended base model using pydantic
     title: str
     content: str
     published: bool = True 
-    rating: Optional[int] = None # for integers
+    #rating: Optional[int] = None # for integers
     id: Optional[int]=None
 
 #code for connecting to the database 
@@ -88,17 +88,24 @@ def get_posts(db: Session = Depends(get_db)):
     return{'data': posts}
 
 
-@app.post('/posts')
-def create_posts(post: Post): 
+@app.post('/posts', status_code=status.HTTP_201_CREATED)
+def create_posts(post:Post, db: Session = Depends(get_db)): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
     # %s is a way of passing parameters to a SQL statement, and passing a sequence of values as the second argument of the function
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING *""", 
-        (post.title, post.content, post.published)) # order those matter 
-    # post_dict=  post.dict()#convert the Post class to a dixtionary 
-    # post_dict['id'] = randrange(0, 100000000) #creates a random integer of
-    # my_posts.append(post_dict)
-    new_post = cursor.fetchone()  
-    conn.commit()
+    # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING *""", 
+    #     (post.title, post.content, post.published)) # order those matter 
+    # # post_dict=  post.dict()#convert the Post class to a dixtionary 
+    # # post_dict['id'] = randrange(0, 100000000) #creates a random integer of
+    # # my_posts.append(post_dict)
+    # new_post = cursor.fetchone()  
+    # conn.commit()
+    # print(**post.dict()) #** is used to unpack a dictionary
+    new_post = models.Post(**post.dict())
+    # new_post = models.Post(
+    #     title=post.title, content=post.content, published=post.published) #to create the posts 
+    db.add(new_post) #to link the created posts to the database 
+    db.commit() #to commit the chnages 
+    db.refresh(new_post) #to get the underline code writtem by retrieving it 
     return{"data": new_post} #to retreive the raw posts
 
 # title str, content str
@@ -142,4 +149,7 @@ def update_post(id: int, post:Post):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
             detail= f"post with id: {id} does not exist" )
     return {"data": updated_post}
+
+
+#anytime you need a path operation to work with the database you need to copy db: Session = Depends(get_db) this into the argument
  
