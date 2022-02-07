@@ -1,6 +1,6 @@
 from typing import Optional
-from fastapi import FastAPI, Response, status
-from fastapi.exceptions import HTTPException 
+from fastapi import FastAPI, Response, status, Depends
+from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Body
 from pydantic import BaseModel
 from random import  randrange
@@ -9,7 +9,7 @@ from psycopg2.extras import RealDictCursor
 import time 
 from sqlalchemy.orm import Session
 from . import models 
-from .database import SessionLocal, engine 
+from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine) #for connecting to the database
 
@@ -73,6 +73,10 @@ def find_index_post(id):
 @app.get("/")
 async def root():
     return {"message" : "Hello world"}
+
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+    return {status: "Success"} #--> dummy database success routes 
 
 @app.get("/posts")
 def get_posts():
