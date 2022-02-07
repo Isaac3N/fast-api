@@ -111,9 +111,11 @@ def create_posts(post:Post, db: Session = Depends(get_db)):
 # title str, content str
 
 @app.get("/posts/{id}") #to retrieve the information from the path
-def get_post(id:int): #to convert the id into an integer
-    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
-    post=cursor.fetchone()
+def get_post(id:int, db: Session = Depends(get_db)): #to convert the id into an integer
+    # cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
+    # post=cursor.fetchone()
+    post = db.query(models.Post).filter(models.Post.id == id).first() #this is the equivalent of doing where in sql and then it finds the first instance and then returns that
+    print(post)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                                 detail=f"post with the id {id} not found.")
