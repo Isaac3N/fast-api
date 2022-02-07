@@ -76,7 +76,8 @@ async def root():
 
 @app.get("/sqlalchemy")
 def test_posts(db: Session = Depends(get_db)):
-    return {status: "Success"} #--> dummy database success routes 
+    posts = db.query(models.Post).all() # to get all the queried posts from a db table called Post 
+    return {"data": posts} #--> dummy database success routes 
 
 @app.get("/posts")
 def get_posts():
