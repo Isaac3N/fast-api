@@ -80,11 +80,12 @@ def test_posts(db: Session = Depends(get_db)):
     return {"data": posts} #--> dummy database success routes 
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute("""SELECT * FROM posts""")# to retreive all posts from our database 
-    posts=cursor.fetchall()
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute("""SELECT * FROM posts""")# to retreive all posts from our database 
+    # posts=cursor.fetchall() --> This is how to retrieve a post using RAW SQL 
+    posts = db.query(models.Post).all()
     print(posts)
-    return{'data': my_posts}
+    return{'data': posts}
 
 
 @app.post('/posts')
