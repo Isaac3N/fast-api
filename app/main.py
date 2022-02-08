@@ -80,7 +80,7 @@ def get_posts(db: Session = Depends(get_db)):
     # posts=cursor.fetchall() --> This is how to retrieve a post using RAW SQL 
     posts = db.query(models.Post).all()
     print(posts)
-    return{'data': posts}
+    return posts 
 
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
@@ -101,7 +101,7 @@ def create_posts(post:schemas.PostCreate, db: Session = Depends(get_db)):
     db.add(new_post) #to link the created posts to the database 
     db.commit() #to commit the chnages 
     db.refresh(new_post) #to get the underline code writtem by retrieving it 
-    return{"data": new_post} #to retreive the raw posts
+    return new_post #to retreive the raw posts
 
 # title str, content str
 
@@ -154,7 +154,7 @@ def update_post(id: int, updated_post:schemas.PostCreate, db: Session = Depends(
 
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
-    return {"data": post_query.first()}
+    return post_query.first()
 
 
 #anytime you need a path operation to work with the database you need to copy db: Session = Depends(get_db) this into the argument
