@@ -1,5 +1,7 @@
+from sqlite3 import Date
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class Post(BaseModel): #this is an extended base model using pydantic 
     title: str
@@ -16,11 +18,14 @@ class PostBase(BaseModel):
 class PostCreate(PostBase): #inheriting all the objects in the postbase class 
     pass 
 
-class Post(BaseModel):
-    title: str 
-    content: str 
-    published: bool
+class Post(PostBase):
+    id: int
+    created_at: datetime 
 
+class Config:
+    orm_mode = True 
+#Pydantic's orm_mode will tell the Pydantic model to read the data even if it is not a dict, 
+# but an ORM model (or any other arbitrary object with attributes).    
 
 # class CreatePost(BaseModel): #schema for created post
 #     title: str 

@@ -83,7 +83,7 @@ def get_posts(db: Session = Depends(get_db)):
     return posts 
 
 
-@app.post('/posts', status_code=status.HTTP_201_CREATED)
+@app.post('/posts', status_code=status.HTTP_201_CREATED, response_model=schemas.Post) #the schema that the response should follow )
 def create_posts(post:schemas.PostCreate, db: Session = Depends(get_db)): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
     # %s is a way of passing parameters to a SQL statement, and passing a sequence of values as the second argument of the function
