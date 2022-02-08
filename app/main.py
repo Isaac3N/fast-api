@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, Response, status, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Body
@@ -74,7 +74,7 @@ async def root():
 #     posts = db.query(models.Post).all() # to get all the queried posts from a db table called Post 
 #     return {"data": posts} #--> dummy database success routes 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[schemas.Post])#to fetch a list of posts )
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")# to retreive all posts from our database 
     # posts=cursor.fetchall() --> This is how to retrieve a post using RAW SQL 
