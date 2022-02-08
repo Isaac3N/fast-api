@@ -8,7 +8,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor 
 import time 
 from sqlalchemy.orm import Session
-from . import models 
+from . import models, schemas
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine) #for connecting to the database
@@ -23,12 +23,7 @@ def get_db():
         db.close()
 
 
-class Post(BaseModel): #this is an extended base model using pydantic 
-    title: str
-    content: str
-    published: bool = True 
-    #rating: Optional[int] = None # for integers
-    id: Optional[int]=None
+
 
 #code for connecting to the database 
 while True: 
@@ -89,7 +84,7 @@ def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_posts(post:Post, db: Session = Depends(get_db)): 
+def create_posts(post:schemas.Post, db: Session = Depends(get_db)): 
     #going to extract all the fields from the body and convert it into a python dictionary and then store it inside the variable payload  
     # %s is a way of passing parameters to a SQL statement, and passing a sequence of values as the second argument of the function
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s ) RETURNING *""", 
@@ -142,7 +137,7 @@ def delete_post(id:int, db: Session = Depends(get_db)):
     return Response(status_code= status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, updated_post:Post, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post:schemas.Post, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE posts SET title= %s, content = %s, published = %s WHERE id = %s 
     #     RETURNING *""", 
     #         (post.title, post.content, post.published, (str(id))))
