@@ -1,5 +1,5 @@
 from sqlite3 import Date
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -24,6 +24,11 @@ class Post(PostBase):
 
 class Config:
     orm_mode = True 
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str 
+
 #Pydantic's orm_mode will tell the Pydantic model to read the data even if it is not a dict, 
 # but an ORM model (or any other arbitrary object with attributes).    
 
