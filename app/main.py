@@ -2,17 +2,16 @@ from typing import Optional, List
 from fastapi import FastAPI, Response, status, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Body
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from random import  randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor 
 import time 
 from sqlalchemy.orm import Session
-from . import models, schemas
+from . import models, schemas, utils
 from .database import SessionLocal, engine
 
-pwd_context = CryptContext(schemes= ["bcrypt"], deprecated="auto") #this tells fast api what the deafult hashing algorithm is
+
 models.Base.metadata.create_all(bind=engine) #for connecting to the database
 
 app = FastAPI()
@@ -165,6 +164,11 @@ def update_post(id: int, updated_post:schemas.PostCreate, db: Session = Depends(
 #creating a user 
 @app.post("/users", status_code=status.HTTP_201_CREATED)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    #hash the password - user.password 
+    hashed_password = utils.hash(user.password) #to hash the password 
+    user.password  = hashed_password 
+
     new_user = models.User(**user.dict())
     db.add(new_user)
     db.commit()
