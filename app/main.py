@@ -2,6 +2,7 @@ from typing import Optional, List
 from fastapi import FastAPI, Response, status, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Body
+from passlib.context import CryptContext
 from pydantic import BaseModel
 from random import  randrange
 import psycopg2
@@ -11,6 +12,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from .database import SessionLocal, engine
 
+pwd_context = CryptContext(schemes= ["bcrypt"], deprecated="auto") #this tells fast api what the deafult hashing algorithm is
 models.Base.metadata.create_all(bind=engine) #for connecting to the database
 
 app = FastAPI()

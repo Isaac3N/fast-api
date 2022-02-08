@@ -28,7 +28,10 @@ class Config:
 class UserCreate(BaseModel):
     email: EmailStr
     password: str 
-
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
 #Pydantic's orm_mode will tell the Pydantic model to read the data even if it is not a dict, 
 # but an ORM model (or any other arbitrary object with attributes).    
 
