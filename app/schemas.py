@@ -16,6 +16,10 @@ class PostBase(BaseModel):
 class PostCreate(PostBase): #inheriting all the objects in the postbase class 
     pass 
 
+class Post(BaseModel):
+    title: str 
+    content: str 
+    published: bool
 
 
 # class CreatePost(BaseModel): #schema for created post
